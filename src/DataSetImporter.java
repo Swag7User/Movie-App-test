@@ -18,6 +18,5 @@ public class DataSetImporter {
 			e.printStackTrace();
 		}
 		this.bufferedReader = new BufferedReader(fileReader);
-		
 	}
 }
