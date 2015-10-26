@@ -6,3 +6,10 @@ public class HelloWorld {
     }
 
 }
+
+<<<<<<< HEAD
+// EAT MY SHIT
+//mjdnmjmskv
+=======
+// EAT MY SHIT
+>>>>>>> refs/remotes/origin/Sandro
