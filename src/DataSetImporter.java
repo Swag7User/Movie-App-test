@@ -28,14 +28,7 @@ public class DataSetImporter {
 			e.printStackTrace();
 		}
 		String [] tokens = lastRaw.split("\t");
-	    
-		String var_1 = tokens[0];
-	    String var_2 = tokens[1];
-	    String var_3 = tokens[2];
-	    String var_4 = tokens[3];
-	    String var_5 = tokens[4];
-	    String var_6 = tokens[5];
-	    
-	    System.out.println(tokens[0]+" "+tokens[1]+" "+tokens[2]+" "+tokens[3]+" "+tokens[4]+" "+tokens[5]+" "+tokens[6]);
+
+		new Movie(tokens[0],tokens[1],tokens[2],tokens[3],tokens[4],tokens[5]);
 	}
 }
