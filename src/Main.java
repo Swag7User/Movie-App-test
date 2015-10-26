@@ -7,5 +7,8 @@ public class Main {
 		// TODO Auto-generated method stub
 		new DataSetImporter("movies_80000.tsv");
 	}
+	
+	//Initializing countries
+	Country a = new Country("Hallo", 200);
 
 }
