@@ -14,6 +14,5 @@ public class Movie {
 	public Movie(String movie){
 		//name has to be set
 		this.name=movie;
-		
 	}
 }
