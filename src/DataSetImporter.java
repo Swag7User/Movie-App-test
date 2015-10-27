@@ -21,14 +21,22 @@ public class DataSetImporter {
 			e.printStackTrace();
 		}
 		this.bufferedReader = new BufferedReader(fileReader);
+		//read all the movies
 		try {
 			lastRaw=bufferedReader.readLine();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		String [] tokens = lastRaw.split("\t");
-
-		new Movie(tokens[0],tokens[1],tokens[2],tokens[3],tokens[4],tokens[5]);
+		while(lastRaw!=null&&!lastRaw.isEmpty()){
+			new Movie(lastRaw);
+			try {
+				lastRaw=bufferedReader.readLine();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 }
+	
