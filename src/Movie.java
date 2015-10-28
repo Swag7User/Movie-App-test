@@ -98,7 +98,7 @@ public class Movie {
 			tokens[6].replace("\"","");
 			//bsp.:/m/064_8sq: French Language, /m/05zjd: Portuguese Language, /m/02h40lc: English Language
 			temporary=tokens[6].split(",");
-			//bsp.:/m/064_8sq: French Language
+			//bsp.:/m/064_8sq: French Language gggg
 			for (int i = 0; i < temporary.length; i++) {
 				temporaryTuple=temporary[i].split(":");
 				if(temporaryTuple.length>=2){
