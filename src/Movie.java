@@ -32,8 +32,8 @@ public class Movie {
 		releaseCalender = Calendar.getInstance();
 		df = new SimpleDateFormat("yyyy-MM-dd"); 
 		String [] tokens = raw.split("\t");
-		language=new ArrayBlockingQueue<String>(10);
-		languageCode=new ArrayBlockingQueue<String>(10);
+		language=new ArrayBlockingQueue<String>(20);
+		languageCode=new ArrayBlockingQueue<String>(20);
 		
 		
 		
@@ -92,28 +92,32 @@ public class Movie {
 			//take strig apart too save all in language array
 			
 			//first split at "," to take apart bsp.: {"/m/064_8sq": "French Language", "/m/05zjd": "Portuguese Language", "/m/02h40lc": "English Language"}
-			tokens[6].replace("{", "");
-			tokens[6].replace("}", "");
+			tokens[6]=tokens[6].replace("{", "");
+			tokens[6]=tokens[6].replace("}", "");
 			//bsp.:"/m/064_8sq": "French Language", "/m/05zjd": "Portuguese Language", "/m/02h40lc": "English Language"		
-			tokens[6].replace("\"","");
+			tokens[6]=tokens[6].replace("\"","");
 			//bsp.:/m/064_8sq: French Language, /m/05zjd: Portuguese Language, /m/02h40lc: English Language
+			tokens[6]=tokens[6].replace("Language","");
+			//bsp.:/m/064_8sq: French , /m/05zjd: Portuguese , /m/02h40lc: English
 			temporary=tokens[6].split(",");
-			//bsp.:/m/064_8sq: French Language gggg
+			//bsp.:/m/064_8sq: French 
 			for (int i = 0; i < temporary.length; i++) {
 				temporaryTuple=temporary[i].split(":");
 				if(temporaryTuple.length>=2){
 					//bsp.:/m/064_8sq    bsp.: French Language
 					
-					System.out.println("temp:"+temporary[i]);
+					System.out.println("wiki:"+wikiID+"temp:"+temporary[i]);
 					if(temporaryTuple[0]!=null&&!temporaryTuple[0].isEmpty()){
-						temporaryTuple[0].trim();
+						temporaryTuple[0]=temporaryTuple[0].trim();
 						languageCode.add(temporaryTuple[0]);
 					}
 					if(temporaryTuple[1]!=null&&!temporaryTuple[1].isEmpty()){
-						temporaryTuple[1].trim();
+						temporaryTuple[1]=temporaryTuple[1].trim();
 						language.add(temporaryTuple[1]);
 					}
+					System.out.println("wiki:"+wikiID+" language:"+temporaryTuple[1]);
 				}
+				
 			}
 		}
 		//this.printMovie();
