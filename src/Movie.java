@@ -12,20 +12,28 @@ public class Movie {
 	private String freebaseID;
 	private String name;
 	private Calendar releaseCalender;
+	
+	private int year;
+	private int month;
+	private int day;
+	
 	private double revenue;
 	private double runtime;
 	private DateFormat df;
 	
 	private ArrayBlockingQueue<String>language;
 	private ArrayBlockingQueue<String>languageCode;
+	
+	private ArrayBlockingQueue<String>country;
+	private ArrayBlockingQueue<String>countryCode;
+	
+	private ArrayBlockingQueue<String>genre;
+	private ArrayBlockingQueue<String>genreCode;
+	
 	private String []temporary;
 	private String []temporaryTuple;
 	
 	private Date date;
-	 //Set to whatever date you want as default
-
-	
-	//date formats
 	
 	public Movie(String raw){
 		//String wiki, String freebase,String movie, String dateString, String revenue, String runtime,String [] languageCountryGenre
@@ -35,7 +43,15 @@ public class Movie {
 		language=new ArrayBlockingQueue<String>(20);
 		languageCode=new ArrayBlockingQueue<String>(20);
 		
+		country=new ArrayBlockingQueue<String>(20);
+		countryCode=new ArrayBlockingQueue<String>(20);
 		
+		genre=new ArrayBlockingQueue<String>(20);
+		genreCode=new ArrayBlockingQueue<String>(20);
+		
+		year=-1;
+		month=-1;
+		day=-1;
 		
 		//in this array is saved if information is missing,true if info available
 		boolean [] tokensFlag=new boolean[tokens.length];
@@ -65,21 +81,16 @@ public class Movie {
 			  
 			
 			if(tokens[3].length()==4){
-				releaseCalender.set(Calendar.YEAR, Integer.parseInt(tokens[3]));
+				year=Integer.parseInt(tokens[3]);
 			}
 			else if(tokens[3].length()==7){
-				releaseCalender.set(Calendar.YEAR, Integer.parseInt(tokens[3].substring(0, 3)));
-				releaseCalender.set(Integer.parseInt(tokens[3].substring(0, 3)), Integer.parseInt(tokens[3].substring(5, 6)), 0);
+				year=Integer.parseInt(tokens[3].substring(0, 4));
+				month=Integer.parseInt(tokens[3].substring(5, 7).replace("0", ""));
 			}
 			else{
-
-					try {
-						this.date = df.parse(tokens[3]);
-						releaseCalender.setTime(date);
-					} catch (ParseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+				year=Integer.parseInt(tokens[3].substring(0, 4));
+				month=Integer.parseInt(tokens[3].substring(5, 7).replace("0", ""));
+				day=Integer.parseInt(tokens[3].substring(8, 10).replace("0", ""));
 			}
 		}
 		if(tokensFlag[4]){
@@ -89,7 +100,7 @@ public class Movie {
 			this.runtime=Double.parseDouble(tokens[5]);
 		}
 		if(tokensFlag[6]){
-			//take strig apart too save all in language array
+			//take string apart too save all in language array, and language code array
 			
 			//first split at "," to take apart bsp.: {"/m/064_8sq": "French Language", "/m/05zjd": "Portuguese Language", "/m/02h40lc": "English Language"}
 			tokens[6]=tokens[6].replace("{", "");
@@ -98,6 +109,7 @@ public class Movie {
 			tokens[6]=tokens[6].replace("\"","");
 			//bsp.:/m/064_8sq: French Language, /m/05zjd: Portuguese Language, /m/02h40lc: English Language
 			tokens[6]=tokens[6].replace("Language","");
+			tokens[6]=tokens[6].replace("language","");
 			//bsp.:/m/064_8sq: French , /m/05zjd: Portuguese , /m/02h40lc: English
 			temporary=tokens[6].split(",");
 			//bsp.:/m/064_8sq: French 
@@ -106,7 +118,7 @@ public class Movie {
 				if(temporaryTuple.length>=2){
 					//bsp.:/m/064_8sq    bsp.: French Language
 					
-					System.out.println("wiki:"+wikiID+"temp:"+temporary[i]);
+
 					if(temporaryTuple[0]!=null&&!temporaryTuple[0].isEmpty()){
 						temporaryTuple[0]=temporaryTuple[0].trim();
 						languageCode.add(temporaryTuple[0]);
@@ -115,21 +127,181 @@ public class Movie {
 						temporaryTuple[1]=temporaryTuple[1].trim();
 						language.add(temporaryTuple[1]);
 					}
-					System.out.println("wiki:"+wikiID+" language:"+temporaryTuple[1]);
 				}
-				
+			}
+		}
+		if(tokensFlag[7]){
+			//take string apart too save all countries in country array, and country code in country code array
+			
+			//first split at "," to take apart bsp.: {"/m/064_8sq": "French Language", "/m/05zjd": "Portuguese Language", "/m/02h40lc": "English Language"}
+			tokens[7]=tokens[7].replace("{", "");
+			tokens[7]=tokens[7].replace("}", "");
+			//bsp.:"/m/064_8sq": "French Language", "/m/05zjd": "Portuguese Language", "/m/02h40lc": "English Language"		
+			tokens[7]=tokens[7].replace("\"","");
+			//bsp.:/m/064_8sq: French , /m/05zjd: Portuguese , /m/02h40lc: English
+			temporary=tokens[7].split(",");
+			//bsp.:/m/064_8sq: French 
+			for (int i = 0; i < temporary.length; i++) {
+				temporaryTuple=temporary[i].split(":");
+				if(temporaryTuple.length>=2){
+					//bsp.:/m/064_8sq    bsp.: French Language
+					
+					if(temporaryTuple[0]!=null&&!temporaryTuple[0].isEmpty()){
+						temporaryTuple[0]=temporaryTuple[0].trim();
+						countryCode.add(temporaryTuple[0]);
+					}
+					if(temporaryTuple[1]!=null&&!temporaryTuple[1].isEmpty()){
+						temporaryTuple[1]=temporaryTuple[1].trim();
+						country.add(temporaryTuple[1]);
+					}
+				}
+			}
+		}
+		if(tokensFlag[8]){
+			//take string apart too save all genres in genres array, and genres code in genres code array
+			
+			//first split at "," to take apart bsp.: {"/m/064_8sq": "French Language", "/m/05zjd": "Portuguese Language", "/m/02h40lc": "English Language"}
+			tokens[8]=tokens[8].replace("{", "");
+			tokens[8]=tokens[8].replace("}", "");
+			//bsp.:"/m/064_8sq": "French Language", "/m/05zjd": "Portuguese Language", "/m/02h40lc": "English Language"		
+			tokens[8]=tokens[8].replace("\"","");
+			//bsp.:/m/064_8sq: French , /m/05zjd: Portuguese , /m/02h40lc: English
+			temporary=tokens[8].split(",");
+			//bsp.:/m/064_8sq: French 
+			for (int i = 0; i < temporary.length; i++) {
+				temporaryTuple=temporary[i].split(":");
+				if(temporaryTuple.length>=2){
+					//bsp.:/m/064_8sq    bsp.: French Language
+					
+					if(temporaryTuple[0]!=null&&!temporaryTuple[0].isEmpty()){
+						temporaryTuple[0]=temporaryTuple[0].trim();
+						genreCode.add(temporaryTuple[0]);
+					}
+					if(temporaryTuple[1]!=null&&!temporaryTuple[1].isEmpty()){
+						temporaryTuple[1]=temporaryTuple[1].trim();
+						genre.add(temporaryTuple[1]);
+					}
+				}
+			
 			}
 		}
 		//this.printMovie();
 	}
+	
+	
+	/**
+	 * @return the wikiID
+	 */
+	public int getWikiID() {
+		return wikiID;
+	}
+
+
+	/**
+	 * @return the freebaseID
+	 */
+	public String getFreebaseID() {
+		return freebaseID;
+	}
+
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @return the revenue
+	 */
+	public double getRevenue() {
+		return revenue;
+	}
+
+
+	/**
+	 * @return the runtime
+	 */
+	public double getRuntime() {
+		return runtime;
+	}
+
+
+	/**
+	 * @return the language
+	 */
+	public ArrayBlockingQueue<String> getLanguage() {
+		return language;
+	}
+
+
+	/**
+	 * @return the languageCode
+	 */
+	public ArrayBlockingQueue<String> getLanguageCode() {
+		return languageCode;
+	}
+
+
+	/**
+	 * @return the country
+	 */
+	public ArrayBlockingQueue<String> getCountry() {
+		return country;
+	}
+
+
+	/**
+	 * @return the countryCode
+	 */
+	public ArrayBlockingQueue<String> getCountryCode() {
+		return countryCode;
+	}
+
+
+	/**
+	 * @return the genre
+	 */
+	public ArrayBlockingQueue<String> getGenre() {
+		return genre;
+	}
+
+
+	/**
+	 * @return the genreCode
+	 */
+	public ArrayBlockingQueue<String> getGenreCode() {
+		return genreCode;
+	}
+
+
 	//mainly for test reasons
 	public void printMovie(){
-		System.out.println("WIKI ID:"+this.wikiID+
+		System.out.print("WIKI ID:"+this.wikiID+
 				"    freebaseID:"+this.freebaseID+
 				"    Movie:"+this.name+
-				"    release Date:"+this.releaseCalender+
 				"    revenue:"+this.revenue+
-				"    runtime:"+this.runtime
-				);
+				"    runtime:"+this.runtime);
+			System.out.print("    release date:");
+			if(year!=-1){
+				System.out.print(year);
+			}
+			if(month!=-1){
+				System.out.print("-"+month);
+			}
+			if(day!=-1){
+				System.out.print("-"+day);
+			}
+			for (String string : language) {
+				System.out.print("    Language:"+string);
+			}
+			for (String string : country) {
+				System.out.print("    Country:"+string);
+			}
+			for (String string : genre) {
+				System.out.print("    Genre:"+string);
+			}
+			System.out.print("\n");
 	}
 }
