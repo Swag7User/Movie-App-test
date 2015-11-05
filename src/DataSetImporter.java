@@ -14,6 +14,7 @@ public class DataSetImporter {
 	private BufferedReader bufferedReader;
 	private String [] tokens;
 	private String lastRaw;
+	private String nextRaw;
 	private PrintWriter writer;
 	
 	int a=0;
@@ -33,8 +34,26 @@ public class DataSetImporter {
 		this.bufferedReader = new BufferedReader(fileReader);
 		try {
 			int amountQuery=0;//how much one query should handel
+			lastRaw=bufferedReader.readLine();
 			while(stop == false){
-				if(amountQuery<500){//500 entries per INSERT INTO STATEMENT
+				nextRaw=bufferedReader.readLine();
+				if(amountQuery<599){//500 entries per INSERT INTO STATEMENT
+					if(lastRaw == null){
+						stop = true;
+					}else{
+						String [] tokens = lastRaw.split("\t");
+					    
+					    printArrayToFile(tokens);
+					    if(nextRaw!=null){
+					    	writer.print(",\n");
+					    }
+					    else{
+					    	writer.print(";\n");
+					    }
+					    amountQuery++;
+					}
+				}
+				else if(amountQuery<600){//bad code here
 					lastRaw=bufferedReader.readLine();
 					if(lastRaw == null){
 						stop = true;
@@ -42,19 +61,18 @@ public class DataSetImporter {
 						String [] tokens = lastRaw.split("\t");
 					    
 					    printArrayToFile(tokens);
-					    writer.print(";\n");
 					    amountQuery++;
 					}
 				}
-				else{
+				else if(nextRaw != null){
 			    		amountQuery=0;
-			    		writer.print(";\n" );
-			    		writer.print("INSERT INTO `moviedata` (`wikidi`,`freebaseid`,`name`,`releasedate`,`boxoffice`,`runtime`,`languages`,`countries`,`genres`) VALUES");
+			    		writer.print(";\nINSERT INTO `moviedata` (`wikiid`,`freebaseid`,`name`,`releasedate`,`boxoffice`,`runtime`,`languages`,`countries`,`genres`) VALUES");
+			    		writer.print("\n" );
 
 			   	}
-				
+				lastRaw=nextRaw;
 			}
-			writer.println("\n/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT *"+";\n"+"/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;\n"+"/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;\n");
+			writer.println("\n/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;\n"+"/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;\n"+"/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;\n");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -88,12 +106,12 @@ public class DataSetImporter {
 		writer.println("  `genres` varchar(400) CHARACTER SET utf8 DEFAULT NULL");
 		writer.println(") ENGINE=InnoDB DEFAULT CHARSET=latin1;");
 		
-		writer.print("INSERT INTO `moviedata` ( `wikiid`, `freebaseid`, `name`, `releasedate`, `boxoffice`, `runtime`, `languages`, `countries`, `genres`) VALUES");
+		writer.print("INSERT INTO `moviedata` ( `wikiid`, `freebaseid`, `name`, `releasedate`, `boxoffice`, `runtime`, `languages`, `countries`, `genres`) VALUES\n");
 	}
 	
 	private void printArrayToFile(String[] tokens){
 		writer.print("(");
-	    for(int i=0; i<tokens.length; i++){
+	    for(int i=0; i<tokens.length-1; i++){
 		    	if(tokens[i]!=null&&!tokens[i].isEmpty()){
 		    		if(tokens[i].contains("\'")){
 		    			tokens[i]=tokens[i].replace("\'", "\'\'");
@@ -113,6 +131,10 @@ public class DataSetImporter {
 		    		writer.print( "NULL, ");
 		    	}
 	    }
+	    if(tokens[tokens.length-1].contains("\'")){
+			tokens[tokens.length-1]=tokens[tokens.length-1].replace("\'", "\'\'");
+		}
+	    writer.print("\'" + tokens[tokens.length-1] + "\'");
 	    writer.print(")" );
 	}
 }
