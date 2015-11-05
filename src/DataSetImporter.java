@@ -80,10 +80,13 @@ public class DataSetImporter {
 		writer.print("(");
 	    for(int i=0; i<tokens.length-1; i++){
 	    	if(tokens[i]!=null&&!tokens[i].isEmpty()){
-	    	writer.print("`" + tokens[i] + "`, ");
+	    		if(tokens[i].contains("`")){
+	    			tokens[i].replace("`", "``");
+	    		}
+	    			writer.print("`" + tokens[i] + "`, ");
 	    	}
 	    	else{
-		    writer.print("`" + "NULL" + "`, ");
+	    		writer.print("`" + "NULL" + "`, ");
 	    	}
 	    }
 	    writer.print("`" +tokens[tokens.length-1] + "`),\n" );
