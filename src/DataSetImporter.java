@@ -30,16 +30,28 @@ public class DataSetImporter {
 		}
 		this.bufferedReader = new BufferedReader(fileReader);
 		try {
+			int amountQuery=0;//how much one query should handel
 			while(stop == false){
-				lastRaw=bufferedReader.readLine();
-				if(lastRaw == null){
-					stop = true;
-				}else{
-					String [] tokens = lastRaw.split("\t");
-				    
-				    printArrayToFile(tokens);
+				if(amountQuery<500){//500 entries per INSERT INTO STATEMENT
+					lastRaw=bufferedReader.readLine();
+					if(lastRaw == null){
+						stop = true;
+					}else{
+						String [] tokens = lastRaw.split("\t");
+					    writer.print("\n");
+					    printArrayToFile(tokens);
+					    amountQuery++;
+					}
 				}
+				else{
+			    		amountQuery=0;
+			    		writer.print(";\n" );
+			    		writer.print("INSERT INTO `moviedata` (`wikidi`,`freebaseid`,`name`,`releasedate`,`boxoffice`,`runtime`,`languages`,`countries`,`genres`) VALUES");
+
+			   	}
+				
 			}
+			writer.println("\n/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT *"+";\n"+"/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;\n"+"/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;\n");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -65,7 +77,7 @@ public class DataSetImporter {
 		writer.println("  `wikiid` int(11) DEFAULT NULL,");
 		writer.println("  `freebaseid` varchar(20) CHARACTER SET utf8 DEFAULT NULL,");
 		writer.println("  `name` varchar(35) CHARACTER SET utf8 DEFAULT NULL,");
-		writer.println("  `releasedate` varchar(10) DEFAULT NULL,");
+		writer.println("  `releasedate` varchar(10) CHARACTER SET utf8 DEFAULT NULL,");
 		writer.println("  `boxoffice` int(12) DEFAULT NULL,");
 		writer.println("  `runtime` decimal(3,1) DEFAULT NULL,");
 		writer.println("  `languages` varchar(500) CHARACTER SET utf8 DEFAULT NULL,");
@@ -73,22 +85,29 @@ public class DataSetImporter {
 		writer.println("  `genres` varchar(400) CHARACTER SET utf8 DEFAULT NULL");
 		writer.println(") ENGINE=InnoDB DEFAULT CHARSET=latin1;");
 		
-		writer.print("INSERT INTO `moviedata` (`wikidi`,`freebaseid`,`name`,`releasedate`,`boxoffice`,`runtime`,`languages`,`countries`,`genres`) VALUES\n");
+		writer.print("INSERT INTO `moviedata` (`wikidi`,`freebaseid`,`name`,`releasedate`,`boxoffice`,`runtime`,`languages`,`countries`,`genres`) VALUES");
 	}
 	
 	private void printArrayToFile(String[] tokens){
 		writer.print("(");
-	    for(int i=0; i<tokens.length-1; i++){
-	    	if(tokens[i]!=null&&!tokens[i].isEmpty()){
-	    		if(tokens[i].contains("`")){
-	    			tokens[i].replace("`", "``");
-	    		}
-	    			writer.print("`" + tokens[i] + "`, ");
-	    	}
-	    	else{
-	    		writer.print("`" + "NULL" + "`, ");
-	    	}
+		 
+	    for(int i=0; i<tokens.length; i++){
+		    	if(tokens[i]!=null&&!tokens[i].isEmpty()){
+		    		if(tokens[i].contains("\'")){
+		    			tokens[i]=tokens[i].replace("\'", "\'\'");
+		    		}
+		    		if(i==0|i==4|i==5){
+		    			writer.print(tokens[i] + ", ");
+
+		    		}
+		    		else{
+		    			writer.print("\'" + tokens[i] + "\', ");
+		    		}
+		    	}
+		    	else{
+		    		writer.print("" + "NULL" + ", ");
+		    	}
 	    }
-	    writer.print("`" +tokens[tokens.length-1] + "`),\n" );
+	    writer.print(")" );
 	}
 }
