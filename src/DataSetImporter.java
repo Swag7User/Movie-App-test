@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 
 //created and maintained by Sandro Luck
 //13-927-769
@@ -15,6 +16,7 @@ public class DataSetImporter {
 	private String lastRaw;
 	private PrintWriter writer;
 	
+	int a=0;
 	private boolean stop = false;
 	
 	public DataSetImporter(String inputFileName, String outputFileName){
@@ -38,8 +40,9 @@ public class DataSetImporter {
 						stop = true;
 					}else{
 						String [] tokens = lastRaw.split("\t");
-					    writer.print("\n");
+					    
 					    printArrayToFile(tokens);
+					    writer.print(";\n");
 					    amountQuery++;
 					}
 				}
@@ -85,27 +88,29 @@ public class DataSetImporter {
 		writer.println("  `genres` varchar(400) CHARACTER SET utf8 DEFAULT NULL");
 		writer.println(") ENGINE=InnoDB DEFAULT CHARSET=latin1;");
 		
-		writer.print("INSERT INTO `moviedata` (`wikidi`,`freebaseid`,`name`,`releasedate`,`boxoffice`,`runtime`,`languages`,`countries`,`genres`) VALUES");
+		writer.print("INSERT INTO `moviedata` ( `wikiid`, `freebaseid`, `name`, `releasedate`, `boxoffice`, `runtime`, `languages`, `countries`, `genres`) VALUES");
 	}
 	
 	private void printArrayToFile(String[] tokens){
 		writer.print("(");
-		 
 	    for(int i=0; i<tokens.length; i++){
 		    	if(tokens[i]!=null&&!tokens[i].isEmpty()){
 		    		if(tokens[i].contains("\'")){
 		    			tokens[i]=tokens[i].replace("\'", "\'\'");
 		    		}
+		    		if(tokens[i].contains("Ã")|tokens[i].contains("©")){
+		    			tokens[i]=tokens[i].replace("Ã", "xxx");
+		    			tokens[i]=tokens[i].replace("©", "yyy");
+		    		}
 		    		if(i==0|i==4|i==5){
 		    			writer.print(tokens[i] + ", ");
-
 		    		}
 		    		else{
 		    			writer.print("\'" + tokens[i] + "\', ");
 		    		}
 		    	}
 		    	else{
-		    		writer.print("" + "NULL" + ", ");
+		    		writer.print( "NULL, ");
 		    	}
 	    }
 	    writer.print(")" );
