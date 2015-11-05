@@ -49,27 +49,43 @@ public class DataSetImporter {
 	}
 	
 	private void initializeDatabase(){
-		writer.println("CREATE DATABASE movies");
-		writer.println("USE movies");
-		writer.println("\nCREATE TABLE table");
+		writer.println("/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;");
+		writer.println("/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;");
+		writer.println("/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;");
+		writer.println("/*!40101 SET NAMES utf8 */;");
+		writer.println("/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;");
+		writer.println("/*!40103 SET TIME_ZONE='+00:00' */;");
+		writer.println("/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;");
+		writer.println("/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;");
+		writer.println("/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;");
+		writer.println("/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;");
+		
+		writer.println("\nCREATE TABLE IF NOT EXISTS `moviedata`");
 		writer.println("(");
-		writer.println("[wiki_id] int(11) NOT NULL AUTO_INCREMENT,");
-		writer.println("[freebase_id] char(20),");
-		writer.println("[name] char(35),");
-		writer.println("[release_date] date(),");
-		writer.println("[box_office] int(),");
-		writer.println("[runtime] int(),");
-		writer.println("[languages] char(),");
-		writer.println("[countries] char(),");
-		writer.println("[genres] char(),");
-		writer.println(")");
+		writer.println("  `wikiid` int(11) DEFAULT NULL,");
+		writer.println("  `freebaseid` varchar(20) CHARACTER SET utf8 DEFAULT NULL,");
+		writer.println("  `name` varchar(35) CHARACTER SET utf8 DEFAULT NULL,");
+		writer.println("  `releasedate` varchar(10) DEFAULT NULL,");
+		writer.println("  `boxoffice` int(12) DEFAULT NULL,");
+		writer.println("  `runtime` decimal(3,1) DEFAULT NULL,");
+		writer.println("  `languages` varchar(500) CHARACTER SET utf8 DEFAULT NULL,");
+		writer.println("  `countries` varchar(200) CHARACTER SET utf8 DEFAULT NULL,");
+		writer.println("  `genres` varchar(400) CHARACTER SET utf8 DEFAULT NULL");
+		writer.println(") ENGINE=InnoDB DEFAULT CHARSET=latin1;");
+		
+		writer.print("INSERT INTO `moviedata` (`wikidi`,`freebaseid`,`name`,`releasedate`,`boxoffice`,`runtime`,`languages`,`countries`,`genres`) VALUES\n");
 	}
 	
 	private void printArrayToFile(String[] tokens){
-		writer.print("INSERT INTO table VALUES (");
+		writer.print("(");
 	    for(int i=0; i<tokens.length-1; i++){
-	    	writer.print("\'" + tokens[i] + "\', ");
+	    	if(tokens[i]!=null&&!tokens[i].isEmpty()){
+	    	writer.print("`" + tokens[i] + "`, ");
+	    	}
+	    	else{
+		    writer.print("`" + "NULL" + "`, ");
+	    	}
 	    }
-	    writer.print(tokens[tokens.length-1] + "\')\n" );
+	    writer.print("`" +tokens[tokens.length-1] + "`),\n" );
 	}
 }
