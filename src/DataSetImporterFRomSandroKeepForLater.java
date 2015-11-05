@@ -5,14 +5,14 @@ import java.io.IOException;
 
 //created and maintained by Sandro Luck
 //13-927-769
-public class DataSetImporter {
+public class DataSetImporterFRomSandroKeepForLater {
 	private final String inputFileName;
 	private FileReader fileReader;
 	private BufferedReader bufferedReader;
 	private String [] tokens;
 	private String lastRaw;
 	
-	public DataSetImporter(String inputFileName){
+	public DataSetImporterFRomSandroKeepForLater(String inputFileName){
 		this.inputFileName=inputFileName;
 		try {
 			this.fileReader = new FileReader(inputFileName);
